@@ -4,13 +4,12 @@ import Jimp from "jimp";
 const raw = await Jimp.read("https://static.wikia.nocookie.net/minecraft_gamepedia/images/f/f5/ItemCSS.png")
 
 export async function fetchIndividualItem(route) {
-    console.log("Fetching:" + route)
     const html = await axios.get(`https://minecraft.fandom.com${route}`).then((res) => res.data)
     const $ = cheerio.load(html)
     let table = $("#ID").parent().nextAll("p").eq(1)/*First "Java Edition", then "Bedrock Edition"*/.next().find("tbody").eq(0)
 
     const header = table.children().eq(0).children().map((i, th) => $(th).text())
-    const namespaceIDIndex = header.toArray().findIndex((t) => t == 'Resource location')
+    const namespaceIDIndex = header.toArray().findIndex((t) => t == 'Identifier')
     const nameIndex = 0//eader.toArray().findIndex((t) => t == 'Name')
     const formIndex = header.toArray().findIndex((t) => t == 'Form')
 
@@ -21,4 +20,5 @@ export async function fetchIndividualItem(route) {
             raw.clone().crop(x, y, 16, 16).write(`out/${$(e.children[namespaceIDIndex]).text()}.png`)
         }
     })
+    console.log("Fetched:" + route)
 }
